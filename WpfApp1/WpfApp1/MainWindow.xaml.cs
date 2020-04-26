@@ -23,6 +23,24 @@ namespace WpfApp1
         public MainWindow()
         {
             InitializeComponent();
+            MouseDown += Window_MouseLeftButtonDown;
+        }
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                this.DragMove();
+            }
+            catch { }
+        }
+
+        private void Menu_Exit(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+        private void Menu_SetOpacity(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

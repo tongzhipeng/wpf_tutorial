@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="100" Width="240" Topmost="True"
+        AllowsTransparency="True" WindowStyle="None" Foreground="White">
+    <Window.Background>
+        <SolidColorBrush Opacity="0.6" Color="#001f55"></SolidColorBrush>
+    </Window.Background>
+    <Window.Resources>
+        <ContextMenu x:Key="ContextMenu">
+            <MenuItem Name="Exit" Header="退出" Click="Menu_Exit"/>
+            <MenuItem Name="SetOpacity" Header="设置透明度" Click="Menu_SetOpacity"/>
+            <MenuItem Name="ShowMore" Header="显示更多"/>
+        </ContextMenu>
+    </Window.Resources>    
+    <Grid Margin="0,0,0,-15" ContextMenu="{StaticResource ContextMenu}">
+        <Grid.Resources>
+            <Style TargetType="Label">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="25*"></ColumnDefinition>
             <ColumnDefinition Width="25*"></ColumnDefinition>
@@ -14,7 +30,6 @@
             <ColumnDefinition Width="25*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25*"></RowDefinition>
             <RowDefinition Height="25*"></RowDefinition>
             <RowDefinition Height="25*"></RowDefinition>
         </Grid.RowDefinitions>

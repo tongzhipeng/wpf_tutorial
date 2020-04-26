@@ -1,64 +1,94 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace WpfXamlDemoContainer
+namespace WpfApplication14
 {
-
-
-    [ValueConversion(typeof(object), typeof(string))]
-    public class StringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value == null ? null : value.ToString();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private double testDouble = 100;
-        public double testDoubleBind { get { return testDouble; } set { testDouble = value; } }
-        //public double testDoubleBind
-        //{
-        //    get { return (double)GetValue(testDoubleProperty); }
-        //    set { SetValue(testDoubleProperty, value); }
-        //}
-        //public static readonly DependencyProperty testDoubleProperty =
-        //    DependencyProperty.Register("testDoubleBind", typeof(double), typeof(Window), new UIPropertyMetadata(1d));
-
+        public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
 
         public MainWindow()
         {
-            testDouble = 200;
             InitializeComponent();
-            
-            //Binding bind = new Binding("testDoubleBind");
-            //bind.Source = this;
-            //bind.Mode = BindingMode.TwoWay;
-            //bind.Converter = UniversalValueConverter;
-            //tb1.SetBinding(TextBox.TextProperty, bind);
-            //testDoubleBind = 100;
+
+            MenuItems = new ObservableCollection<MenuItemViewModel>
+            {
+                new MenuItemViewModel { Header = "Alpha" },
+                new MenuItemViewModel { Header = "Beta",
+                    MenuItems = new ObservableCollection<MenuItemViewModel>
+                        {
+                            new MenuItemViewModel { Header = "Beta1" },
+                            new MenuItemViewModel { Header = "Beta2",
+                                MenuItems = new ObservableCollection<MenuItemViewModel>
+                                {
+                                    new MenuItemViewModel { Header = "Beta1a" },
+                                    new MenuItemViewModel { Header = "Beta1b" },
+                                    new MenuItemViewModel { Header = "Beta1c" }
+                                }
+                            },
+                            new MenuItemViewModel { Header = "Beta3" }
+                        }
+                },
+                new MenuItemViewModel { Header = "Gamma" }
+            };
+
+            DataContext = this;
+        }
+    }
+
+    public class MenuItemViewModel
+    {
+        private readonly ICommand _command;
+
+        public MenuItemViewModel()
+        {
+            _command = new CommandViewModel(Execute);
+        }
+
+        public string Header { get; set; }
+
+        public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
+
+        public ICommand Command
+        {
+            get
+            {
+                return _command;
+            }
+        }
+
+        private void Execute()
+        {
+            // (NOTE: In a view model, you normally should not use MessageBox.Show()).
+            MessageBox.Show("Clicked at " + Header);
+        }
+    }
+
+    public class CommandViewModel : ICommand
+    {
+        private readonly Action _action;
+
+        public CommandViewModel(Action action)
+        {
+            _action = action;
+        }
+
+        public void Execute(object o)
+        {
+            _action();
+        }
+
+        public bool CanExecute(object o)
+        {
+            return true;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { }
+            remove { }
         }
     }
 }
