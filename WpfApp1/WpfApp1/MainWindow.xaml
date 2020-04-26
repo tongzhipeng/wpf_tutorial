@@ -8,13 +8,22 @@
         Title="MainWindow" Height="100" Width="240" Topmost="True"
         AllowsTransparency="True" WindowStyle="None" Foreground="White">
     <Window.Background>
-        <SolidColorBrush Opacity="0.6" Color="#001f55"></SolidColorBrush>
+        <SolidColorBrush Opacity="{Binding opacityBind, Mode=TwoWay}" Color="#001f55"></SolidColorBrush>
     </Window.Background>
     <Window.Resources>
-        <ContextMenu x:Key="ContextMenu">
-            <MenuItem Name="Exit" Header="退出" Click="Menu_Exit"/>
-            <MenuItem Name="SetOpacity" Header="设置透明度" Click="Menu_SetOpacity"/>
-            <MenuItem Name="ShowMore" Header="显示更多"/>
+        <ContextMenu x:Key="ContextMenu" ItemsSource="{Binding MenuItems}">
+            <ContextMenu.ItemContainerStyle>
+                <Style TargetType="{x:Type MenuItem}">
+                    <Setter Property="Command" Value="{Binding Command}" />
+                    <Setter Property="IsCheckable" Value="{Binding IsCheckable}"/>
+                    <Setter Property="IsChecked" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                </Style>
+            </ContextMenu.ItemContainerStyle>
+            <ContextMenu.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:MenuItemViewModel}" ItemsSource="{Binding Path=MenuItems}">
+                    <TextBlock Text="{Binding Header}"/>
+                </HierarchicalDataTemplate>
+            </ContextMenu.ItemTemplate>
         </ContextMenu>
     </Window.Resources>    
     <Grid Margin="0,0,0,-15" ContextMenu="{StaticResource ContextMenu}">

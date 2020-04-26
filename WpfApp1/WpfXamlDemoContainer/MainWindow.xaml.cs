@@ -19,19 +19,19 @@ namespace WpfApplication14
                 new MenuItemViewModel { Header = "Beta",
                     MenuItems = new ObservableCollection<MenuItemViewModel>
                         {
-                            new MenuItemViewModel { Header = "Beta1" },
-                            new MenuItemViewModel { Header = "Beta2",
+                            new MenuItemViewModel { Header = "Beta1", Name = "_beta1" },
+                            new MenuItemViewModel { Header = "Beta2", Name="_beta2",
                                 MenuItems = new ObservableCollection<MenuItemViewModel>
                                 {
-                                    new MenuItemViewModel { Header = "Beta1a" },
-                                    new MenuItemViewModel { Header = "Beta1b" },
-                                    new MenuItemViewModel { Header = "Beta1c" }
+                                    new MenuItemViewModel { Header = "Beta1a", Name = "_beta1a" },
+                                    new MenuItemViewModel { Header = "Beta1b", Name = "_beta1b" },
+                                    new MenuItemViewModel { Header = "Beta1c", Name = "_beta1c" }
                                 }
                             },
-                            new MenuItemViewModel { Header = "Beta3" }
+                            new MenuItemViewModel { Header = "Beta3", Name="_beta3" }
                         }
                 },
-                new MenuItemViewModel { Header = "Gamma" }
+                new MenuItemViewModel { Header = "Gamma", Name="_gamma" }
             };
 
             DataContext = this;
@@ -48,6 +48,7 @@ namespace WpfApplication14
         }
 
         public string Header { get; set; }
+        public string Name { get; set; }
 
         public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
 
@@ -62,7 +63,11 @@ namespace WpfApplication14
         private void Execute()
         {
             // (NOTE: In a view model, you normally should not use MessageBox.Show()).
-            MessageBox.Show("Clicked at " + Header);
+            MessageBox.Show("Clicked at " + Name);
+        }
+        static void HandleCommand(string menu_name)
+        {
+            
         }
     }
 
