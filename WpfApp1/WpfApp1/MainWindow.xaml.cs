@@ -61,12 +61,35 @@ namespace WpfApp1
                 OnPropertyChanged("opacityBind");  
             } 
         }
+        private string secondRowHeight;
+        public string secondRowHeightBind
+        {
+            get 
+            {
+                return secondRowHeight;
+            }
+            set
+            {
+                secondRowHeight = value;
+                OnPropertyChanged("secondRowHeightBind");
+            }
+        }
+
+        public void ShowMore()
+        {
+            secondRowHeight = "25*";
+        }
+        public void HideMore()
+        {
+            secondRowHeight = "0*";
+        }
 
         public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
         public MainWindow()
         {
             InitializeComponent();
             MouseDown += Window_MouseLeftButtonDown;
+            var main_window = this;
             var opacity_menu_vm = new MenuItemViewModel
                 {
                     Header = "设置透明度",
@@ -83,12 +106,11 @@ namespace WpfApp1
                         {
                             new MenuItemViewModel { Header = "退出", Name = "Exit" },
                             opacity_menu_vm,
-                            new MenuItemViewModel { Header = "显示更多", Name="_beta3" }
+                            new MenuItemViewModel { Header = "显示更多", Name="ShowMore", main_window = main_window }
                         };
 
 
-            DataContext = this;
-            opacityBind = 0.4;
+            DataContext = this;            
         }
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -108,7 +130,7 @@ namespace WpfApp1
         {
             _command = new CommandViewModel(Execute);
         }
-
+        public MainWindow main_window { set; get; }
         public string Header { get; set; }
         public string Name { get; set; }
 
@@ -128,12 +150,12 @@ namespace WpfApp1
                 return false;
             }
         }
-
+        protected bool _is_selected = false;
         private void Execute()
         {           
             HandleCommand(Name);
         }
-        static void HandleCommand(string menu_name)
+        void HandleCommand(string menu_name)
         {
             if (menu_name == "Exit")
             {
@@ -141,16 +163,45 @@ namespace WpfApp1
             }
             else if (menu_name == "ShowMore")
             {
-
+                if (_is_selected)
+                {
+                    main_window.ShowMore();
+                }
+                else
+                {
+                    main_window.HideMore();
+                }
             }
         }
     }
 
-    public class OpacityMenuItemViewModel : MenuItemViewModel
+    public class ToggleMenuItemViewModel : MenuItemViewModel
+    {
+        public new bool IsCheckable
+        {
+            get
+            {
+                return true;
+            }
+        }        
+        public bool IsSelected
+        {
+            get
+            {
+                return _is_selected;
+            }
+            set
+            {
+                _is_selected = value;
+                OnPropertyChanged("IsSelected");
+            }
+        }
+    }
+
+    public class OpacityMenuItemViewModel : ToggleMenuItemViewModel
     {    
         public double Opacity { set; get; }
-        public MenuItemViewModel opacity_parent_view_group { set; get; }
-        public MainWindow main_window { set; get; }
+        public MenuItemViewModel opacity_parent_view_group { set; get; }        
         private void Execute()
         {
             foreach (var item in opacity_parent_view_group.MenuItems)
@@ -163,14 +214,8 @@ namespace WpfApp1
         {
             _command = new CommandViewModel(Execute);
         }
-        public new bool IsCheckable
-        {
-            get
-            {
-                return true;
-            }
-        }
-        public bool IsSelected
+
+        public new bool IsSelected
         {
             get
             {

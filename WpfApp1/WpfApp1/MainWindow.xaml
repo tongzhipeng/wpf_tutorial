@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="100" Width="240" Topmost="True"
+        Title="MainWindow" SizeToContent="WidthAndHeight" Height="Auto" Width="Auto"
+        Topmost="True"
         AllowsTransparency="True" WindowStyle="None" Foreground="White">
     <Window.Background>
         <SolidColorBrush Opacity="{Binding opacityBind, Mode=TwoWay}" Color="#001f55"></SolidColorBrush>
@@ -26,10 +27,12 @@
             </ContextMenu.ItemTemplate>
         </ContextMenu>
     </Window.Resources>    
-    <Grid Margin="0,0,0,-15" ContextMenu="{StaticResource ContextMenu}">
+    <Grid Margin="0,0,0,0" ContextMenu="{StaticResource ContextMenu}">
         <Grid.Resources>
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="Margin" Value="10, 10, 10, 10"/>
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
@@ -43,12 +46,12 @@
             <RowDefinition Height="25*"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Grid.Column="0">CPU</Label>
-        <Label Grid.Row="0" Grid.Column="1"></Label>
-        <Label Grid.Row="0" Grid.Column="2">内存</Label>
-        <Label Grid.Row="0" Grid.Column="3"></Label>
-        <Label Grid.Row="1" Grid.Column="0">GDI对象</Label>
-        <Label Grid.Row="1" Grid.Column="1"></Label>
+        <Label Grid.Row="0" Grid.Column="1">50%</Label>
+        <Label Grid.Row="1" Grid.Column="0">内存</Label>
+        <Label Grid.Row="1" Grid.Column="1">500MB</Label>
+        <Label Grid.Row="0" Grid.Column="2">GDI对象</Label>
+        <Label Grid.Row="0" Grid.Column="3">2000</Label>
         <Label Grid.Row="1" Grid.Column="2">句柄</Label>
-        <Label Grid.Row="1" Grid.Column="3"></Label>
+        <Label Grid.Row="1" Grid.Column="3" Foreground="Red">3000</Label>
     </Grid>
 </Window>
