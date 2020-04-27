@@ -32,26 +32,38 @@
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="FontSize" Value="20"/>
-                <Setter Property="Margin" Value="10, 10, 10, 10"/>
+                <Setter Property="Padding" Value="10, 10, 10, 10"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+            <Style TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
+            <ColumnDefinition Width="25*"></ColumnDefinition>            
+            <ColumnDefinition Width="{Binding secondColumnWidthBind}"></ColumnDefinition>            
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25*"></RowDefinition>
             <RowDefinition Height="25*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Grid.Column="0">CPU</Label>
-        <Label Grid.Row="0" Grid.Column="1">50%</Label>
-        <Label Grid.Row="1" Grid.Column="0">内存</Label>
-        <Label Grid.Row="1" Grid.Column="1">500MB</Label>
-        <Label Grid.Row="0" Grid.Column="2">GDI对象</Label>
-        <Label Grid.Row="0" Grid.Column="3">2000</Label>
-        <Label Grid.Row="1" Grid.Column="2">句柄</Label>
-        <Label Grid.Row="1" Grid.Column="3" Foreground="Red">3000</Label>
+        <StackPanel Name="cpu" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
+            <Label HorizontalAlignment="Left">CPU</Label>
+            <Label>50%</Label>
+        </StackPanel>
+        <StackPanel x:Name="gdi" Grid.Row="0" Grid.Column="1">
+            <Label>GDI对象</Label>
+            <Label>2000</Label>
+        </StackPanel>
+        <StackPanel x:Name="mem" Grid.Row="1" Grid.Column="0">
+            <Label>内存</Label>
+            <Label>500MB</Label>
+        </StackPanel>
+        <StackPanel x:Name="handle" Grid.Row="1" Grid.Column="1">
+            <Label>句柄</Label>
+            <Label Foreground="Red">3000</Label>
+        </StackPanel>        
+
     </Grid>
 </Window>

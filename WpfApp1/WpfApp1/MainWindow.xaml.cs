@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WpfApp1
 {
@@ -32,11 +27,45 @@ namespace WpfApp1
             }
         }
     }
+
+    [Serializable]
+    public class WindowStat
+    {
+        public double opacity;
+        public string secondColumnWidth;
+        public double Left;
+        public double Top;
+    }
+    public static class DebounceClass
+    {
+        public static Action<T> Debounce<T>(this Action<T> func, int milliseconds = 2000)
+        {
+            var last = 0;
+            return arg =>
+            {
+                var current = Interlocked.Increment(ref last);
+                Task.Delay(milliseconds).ContinueWith(task =>
+                {
+                    if (current == last) func(arg);
+                    task.Dispose();
+                });
+            };
+        }
+    }
+
+    public struct ItemValue
+    {
+        double current_value;
+        double warning_value;
+    }
+    
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public static Dictionary<string, double> perf_values;//性能数据
+        public static Dictionary<string, double> perf_thredhold_values;//报警阈值
         public event PropertyChangedEventHandler PropertyChanged;
 
         // Create the OnPropertyChanged method to raise the event
@@ -47,6 +76,15 @@ namespace WpfApp1
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }
+            if (name == "opacityBind" || name == "secondColumnWidthBind")
+            {
+                SaveUIConfig();
+            }            
+        }
+
+        public static void UpdatePerfValue(string name, double value)
+        {
+            perf_values[name] = value;
         }
 
         public static double opacity = 1.0;     
@@ -61,34 +99,74 @@ namespace WpfApp1
                 OnPropertyChanged("opacityBind");  
             } 
         }
-        private string secondRowHeight;
-        public string secondRowHeightBind
+        private string secondColumnWidth = "0*";
+        public string secondColumnWidthBind
         {
             get 
             {
-                return secondRowHeight;
+                return secondColumnWidth;
             }
             set
             {
-                secondRowHeight = value;
-                OnPropertyChanged("secondRowHeightBind");
+                secondColumnWidth = value;
+                OnPropertyChanged("secondColumnWidthBind");
             }
+        }
+
+        void SaveUIConfig()
+        {
+            using (FileStream fs = new FileStream("UI.dat", FileMode.Create))
+            {
+                WindowStat stat = new WindowStat { opacity = opacity, secondColumnWidth = secondColumnWidth, Left = Left, Top = Top };
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(fs, stat);                                
+            }
+        }
+        void LoadUIConfig()
+        {
+            try
+            {
+                using (FileStream fs = new FileStream("UI.dat", FileMode.Open))
+                {                    
+                    BinaryFormatter bf = new BinaryFormatter();
+                    WindowStat stat = bf.Deserialize(fs) as WindowStat;
+                    opacity = stat.opacity;
+                    secondColumnWidth = stat.secondColumnWidth;
+                    WindowStartupLocation = WindowStartupLocation.Manual;
+                    Left = stat.Left;
+                    Top = stat.Top;
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+
+            }
+            catch (SerializationException e)
+            {
+
+            }
+
         }
 
         public void ShowMore()
         {
-            secondRowHeight = "25*";
+            secondColumnWidthBind = "25*";
         }
         public void HideMore()
         {
-            secondRowHeight = "0*";
+            secondColumnWidthBind = "0*";
         }
-
+        public bool IsShowMore()
+        {
+            return secondColumnWidthBind != "0*";
+        }
         public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
         public MainWindow()
         {
+            LoadUIConfig();
             InitializeComponent();
             MouseDown += Window_MouseLeftButtonDown;
+            LocationChanged += MainWindow_LocationChanged;
             var main_window = this;
             var opacity_menu_vm = new MenuItemViewModel
                 {
@@ -106,12 +184,24 @@ namespace WpfApp1
                         {
                             new MenuItemViewModel { Header = "退出", Name = "Exit" },
                             opacity_menu_vm,
-                            new MenuItemViewModel { Header = "显示更多", Name="ShowMore", main_window = main_window }
+                            new ToggleMenuItemViewModel { Header = "显示更多", Name="ShowMore", main_window = main_window, IsSelected = IsShowMore() }
                         };
 
 
-            DataContext = this;            
+            DataContext = this;        
         }
+        private void MainWindow_LocationChanged(object sender, EventArgs e)
+        {
+            
+            Action<int> a = (arg)=>
+            {
+                this.Dispatcher.Invoke(SaveUIConfig);                
+            };
+            var debouncedWrapper = DebounceClass.Debounce<int>(a);
+            debouncedWrapper(0);
+
+        }
+
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
@@ -119,7 +209,8 @@ namespace WpfApp1
                 this.DragMove();
             }
             catch { }
-        }  
+        } 
+        
     }
 
     public class MenuItemViewModel : ViewModelBase
@@ -176,7 +267,11 @@ namespace WpfApp1
     }
 
     public class ToggleMenuItemViewModel : MenuItemViewModel
-    {
+    {        
+        public ToggleMenuItemViewModel()
+        {
+
+        }
         public new bool IsCheckable
         {
             get
@@ -187,7 +282,7 @@ namespace WpfApp1
         public bool IsSelected
         {
             get
-            {
+            {    
                 return _is_selected;
             }
             set
@@ -197,6 +292,7 @@ namespace WpfApp1
             }
         }
     }
+    
 
     public class OpacityMenuItemViewModel : ToggleMenuItemViewModel
     {    
